@@ -22,4 +22,37 @@ export const getProducts = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
+
+// Delete a product by ID
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Product.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update (edit) a product by ID
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, des, price, src } = req.body;
+    const updated = await Product.findByIdAndUpdate(
+      id,
+      { name, des, price, src },
+      { new: true, runValidators: true }
+    );
+    if (!updated) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
