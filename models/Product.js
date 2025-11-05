@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema(
         "carcharger",
         "bags",
         "bavin",
-        "baeutifiers",
+        "beautifiers",
         "cables",
         "chargers",
         "earbuds",
