@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema(
     des: { type: String, required: true },
     price: { type: Number, required: true },
     src: { type: String, required: true }, // image URL / base64 / cloud link
+    public_id: { type: String }, // Cloudinary public_id (optional, recommended)
     category: {
       type: String,
       required: true,

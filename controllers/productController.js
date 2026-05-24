@@ -1,5 +1,18 @@
 import Product from "../models/Product.js";
 
+// Upload Image
+export const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
+    // multer-storage-cloudinary attaches the secure Cloudinary URL to req.file.path
+    res.status(200).json({ imageUrl: req.file.path });
+  } catch (error) {
+    res.status(500).json({ message: "Image upload failed: " + error.message });
+  }
+};
+
 // Add product
 export const addProduct = async (req, res) => {
   try {
@@ -33,7 +46,14 @@ export const addProduct = async (req, res) => {
       return res.status(400).json({ message: "Invalid category" });
     }
 
-    const product = await Product.create({ name, des, price, src, category });
+    const product = await Product.create({
+      name,
+      des,
+      price,
+      src,
+      category,
+      public_id: req.file?.public_id,
+    });
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,7 +90,15 @@ export const getProducts = async (req, res) => {
       filter.category = category;
     }
 
-    const products = await Product.find(filter).sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -95,8 +123,7 @@ export const deleteProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, des, price, src, category } = req.body;
-
+    const { name, des, price, src, public_id, category } = req.body;
     const allowedCategories = [
       "headset",
       "carcharger",
@@ -123,8 +150,8 @@ export const updateProduct = async (req, res) => {
 
     const updated = await Product.findByIdAndUpdate(
       id,
-      { name, des, price, src, category },
-      { new: true, runValidators: true }
+      { name, des, price, src, category, public_id: req.file?.public_id },
+      { new: true, runValidators: true },
     );
 
     if (!updated) {

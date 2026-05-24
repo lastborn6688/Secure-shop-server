@@ -4,11 +4,14 @@ import {
   getProducts,
   deleteProduct,
   updateProduct,
+  uploadImage,
 } from "../controllers/productController.js";
+import upload from "../config/cloudinary.js";
 
 const router = express.Router();
 
 // Create and fetch
+router.post("/upload", upload.single("image"), uploadImage);
 router.post("/", addProduct);
 router.get("/", getProducts);
 
